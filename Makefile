@@ -21,6 +21,8 @@ RM = rm -rf
 
 VPATH = ./app/src
 
+LOCAL_INSTALL = /usr/local/bin
+
 $(OBJ_DIR)/%.o: %.c
 			$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
@@ -35,6 +37,9 @@ clean:
 
 fclean: clean
 	$(RM) $(NAME)
+
+install: $(NAME)
+	cp $(NAME) $(LOCAL_INSTALL)
 
 re: fclean all
 
