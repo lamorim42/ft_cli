@@ -66,7 +66,7 @@ obj_dir:\n\
 \n\
 int	main(void)\n\
 {\n\
-\n\
+\treturn (0);\n\
 }\n"
 typedef struct s_cli
 {

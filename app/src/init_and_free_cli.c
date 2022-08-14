@@ -7,6 +7,7 @@ void	init_cli(cli *data, int argc, char **argv)
 	data->arg = strdup(argv[2]);
 	data->name = strdup(argv[3]);
 	data->dir = NULL;
+	data->include = NULL;
 	if (argc > 4)
 		printf("Not implemented yet!\n");
 }
@@ -18,4 +19,6 @@ void	free_cli(cli *data)
 	free(data->name);
 	if (data->dir)
 		free(data->dir);
+	if (data->include)
+		free(data->include);
 }
