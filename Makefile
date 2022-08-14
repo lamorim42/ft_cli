@@ -5,12 +5,13 @@ CFLAGS	= -Wall -Werror -Wextra -g
 INCLUDE	= -I ./app/include
 
 SRC = main.c
-SRC += init_cli.c
+SRC += init_and_free_cli.c
 SRC += validate_option.c
 SRC += validate_arg.c
 SRC += validate_name.c
 SRC += building_project.c
 SRC += cli_utils.c
+SRC += write_in_files.c
 
 OBJS = $(SRC:.c=.o)
 OBJ = $(addprefix ./app/obj/, $(OBJS))
@@ -30,15 +31,18 @@ $(NAME): $(OBJ)
 
 clean:
 	$(RM) $(OBJ)
-
-fclean:
-	$(RM) $(OBJ)
 	$(RM) $(OBJ_DIR)
+
+fclean: clean
 	$(RM) $(NAME)
 
 re: fclean all
 
 obj_dir:
-	@mkdir -p $(OBJ_DIR)
+	@if [ ! -d "$(OBJ_DIR)" ]; then\
+		mkdir $(OBJ_DIR);\
+	else\
+		echo "make: Nothing to be done for 'all'.";\
+	fi
 
 .PHONY= all clean fclean re $(NAME)

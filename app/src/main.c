@@ -12,6 +12,7 @@ int	main(int argc, char **argv)
 	}
 	init_cli(&data, argc, argv);
 	validate_option(&data);
+	write_in_files(&data);
 	free_cli(&data);
 	return (0);
 }

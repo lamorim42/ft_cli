@@ -72,12 +72,10 @@ static void	make_main(cli *data)
 static void	make_include(cli *data)
 {
 	char	*pathinclude;
-	char	*include;
 
-	include = join(data->name, ".h");
+	data->include = join(data->name, ".h");
 	pathinclude = join(data->dir, "app/includes/");
-	make_file(pathinclude, include);
-	free(include);
+	make_file(pathinclude, data->include);
 	free(pathinclude);
 }
 

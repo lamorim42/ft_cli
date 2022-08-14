@@ -13,3 +13,22 @@ char	*join(char *s1, char *s2)
 	}
 	return (join);
 }
+
+char	*strmapi(char const *s, int (*f)(int))
+{
+	unsigned int	i;
+	char			*s_cpy;
+
+	if (!s)
+		return (NULL);
+	i = 0;
+	s_cpy = strdup(s);
+	if (!s_cpy)
+		return (NULL);
+	while (s_cpy[i])
+	{
+		s_cpy[i] = (*f)(s_cpy[i]);
+		i++;
+	}
+	return (s_cpy);
+}
