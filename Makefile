@@ -21,6 +21,8 @@ RM = rm -rf
 
 VPATH = ./app/src
 
+LOCAL_INSTALL = /usr/local/bin
+
 $(OBJ_DIR)/%.o: %.c
 			$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
@@ -36,6 +38,9 @@ clean:
 fclean: clean
 	$(RM) $(NAME)
 
+install: $(NAME)
+	cp $(NAME) $(LOCAL_INSTALL)
+
 re: fclean all
 
 obj_dir:
@@ -45,4 +50,4 @@ obj_dir:
 		echo "make: Nothing to be done for 'all'.";\
 	fi
 
-.PHONY= all clean fclean re $(NAME)
+.PHONY= all clean fclean re install $(NAME)
