@@ -1,9 +1,9 @@
 
 #include "ft_cli.h"
 
-static void	write_in_file(cli *data, char *file, char *text);
+static void	write_in_file(t_cli *data, char *file, char *text);
 
-void	write_in_files(cli *data)
+void	write_in_files(t_cli *data)
 {
 	char	*include = join("app/includes/", data->include);
 	char	*file[4] = {"Makefile", "README.md", include, "app/src/main.c"};
@@ -19,7 +19,7 @@ void	write_in_files(cli *data)
 	free(include);
 }
 
-static void	write_in_file(cli *data, char *file, char *text)
+static void	write_in_file(t_cli *data, char *file, char *text)
 {
 	char	*pathfile;
 	int		fd;

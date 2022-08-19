@@ -3,13 +3,13 @@
 
 static int	make_dir(char *cwd);
 static char	*make_path_dir(char *cwd, char *name);
-static void	make_structs(cli *data);
+static void	make_structs(t_cli *data);
 static void	make_file(char *path, char *file);
-static void	make_dir_structs(cli *data);
-static void	make_main(cli *data);
-static void	make_include(cli *data);
+static void	make_dir_structs(t_cli *data);
+static void	make_main(t_cli *data);
+static void	make_include(t_cli *data);
 
-void	building_project(cli *data)
+void	building_project(t_cli *data)
 {
 	char	cwd[500];
 
@@ -49,7 +49,7 @@ static char	*make_path_dir(char *cwd, char *name)
 	return (new_dir);
 }
 
-static void	make_structs(cli *data)
+static void	make_structs(t_cli *data)
 {
 	printf("Building %s\n", data->name);
 	make_file(data->dir, "Makefile");
@@ -60,7 +60,7 @@ static void	make_structs(cli *data)
 	make_include(data);
 }
 
-static void	make_main(cli *data)
+static void	make_main(t_cli *data)
 {
 	char	*pathmain;
 
@@ -69,7 +69,7 @@ static void	make_main(cli *data)
 	free(pathmain);
 }
 
-static void	make_include(cli *data)
+static void	make_include(t_cli *data)
 {
 	char	*pathinclude;
 
@@ -89,7 +89,7 @@ static void	make_file(char *path, char *file)
 	free(pathname);
 }
 
-static void	make_dir_structs(cli *data)
+static void	make_dir_structs(t_cli *data)
 {
 	char *dirs[3];
 

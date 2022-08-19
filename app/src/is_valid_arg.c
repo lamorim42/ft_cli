@@ -1,10 +1,11 @@
 
 #include "ft_cli.h"
 
-void	validate_arg(cli *data)
+int	is_valid_arg(t_cli *data)
 {
 	if (!strcmp(data->arg, "project"))
-		validate_name(data);
+		return (1);
 	else
 		dprintf(2, "%s: Not a valid argumment!\n", data->arg);
+	return (0);
 }

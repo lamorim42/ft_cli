@@ -1,7 +1,7 @@
 
 #include "ft_cli.h"
 
-void	init_cli(cli *data, int argc, char **argv)
+void	init_cli(t_cli *data, int argc, char **argv)
 {
 	data->option = strdup(argv[1]);
 	data->arg = strdup(argv[2]);
@@ -12,7 +12,7 @@ void	init_cli(cli *data, int argc, char **argv)
 		printf("Not implemented yet!\n");
 }
 
-void	free_cli(cli *data)
+void	free_cli(t_cli *data)
 {
 	free(data->option);
 	free(data->arg);

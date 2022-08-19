@@ -6,9 +6,10 @@ INCLUDE	= -I ./app/include
 
 SRC = main.c
 SRC += init_and_free_cli.c
-SRC += validate_option.c
-SRC += validate_arg.c
-SRC += validate_name.c
+SRC += is_valid_option.c
+SRC += is_valid_arg.c
+SRC += is_valid_name.c
+SRC += input_validation.c
 SRC += building_project.c
 SRC += cli_utils.c
 SRC += write_in_files.c
