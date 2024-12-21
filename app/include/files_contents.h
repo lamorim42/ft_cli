@@ -58,4 +58,16 @@ int	main(void)\n\
 \treturn (0);\n\
 }\n"
 
+# define FALLBACK "Usage:\tft [option] [argument] [project_name]\n\
+      \tTry 'ft --help' for more information.\n"
+
+# define HELP "Usage:\tft [option] [argument] [project_name]\n\
+\nOptions:\n\
+\t- new: Creat a new argument\n\
+\n\
+Argumens:\n\
+\t- projec: Use to creat new project\n\
+\n\
+Exemple: ft new project my_project\n"
+
 #endif
