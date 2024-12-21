@@ -8,14 +8,14 @@ on:
     types: [closed]
 
 jobs:
-  create-pr-to-develop:
-    if: startsWith(github.ref_name, 'feature/')
+  auto-pr:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Create Pull Request to Develop
+        if: startsWith(github.ref_name, 'feature/')
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -24,47 +24,18 @@ jobs:
           title: 'Auto: Merge feature to develop'
           body: 'Automatically created pull request from feature branch.'
 
-  create-release-branch-and-pr:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Determine release version
-        id: get_version
-        run: |
-          echo "release_version=$(date +'%Y.%m.%d')" >> $GITHUB_ENV
-
-      - name: Create release branch
+      - name: Create Release Branch and PR
+        if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'develop'
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout develop
-          git checkout -b release/${{ steps.get_version.outputs.release_version }}
-          git push origin release/${{ steps.get_version.outputs.release_version }}
+          release_version=$(date +'%Y.%m.%d')
+          git checkout -b release/${release_version}
+          git push origin release/${release_version}
+          gh pr create --base release/${release_version} --head develop --title "Auto: Merge develop to release" --body "Automatically created pull request from develop to release."
 
-      - name: Create Pull Request to Release
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: release/${{ steps.get_version.outputs.release_version }}
-          branch: develop
-          title: 'Auto: Merge develop to release'
-          body: 'Automatically created pull request from develop to release.'
-
-  create-pr-to-main:
-    if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Create Pull Request to Main
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          base: main
-          branch: ${{ github.event.pull_request.base.ref }}
-          title: 'Auto: Merge release to main'
-          body: 'Automatically created pull request from release to main.'
+      - name: Create PR to Main
+        if: github.event.pull_request.merged == true && startsWith(github.event.pull_request.base.ref, 'release/')
+        run: |
+          gh pr create --base main --head ${{ github.event.pull_request.base.ref }} --title "Auto: Merge release to main" --body "Automatically created pull request from release to main."
