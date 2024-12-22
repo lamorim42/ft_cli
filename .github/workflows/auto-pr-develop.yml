@@ -1,0 +1,34 @@
+name: Auto PR feature to develop
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+ 
+jobs:
+  updateAuthor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract Git commit data
+        run: |
+          echo "GIT_COMMIT_AUTHOR_NAME=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
+          echo "GIT_COMMIT_AUTHOR_EMAIL=$(git log -1 --pretty=format:'%ae')" >> $GITHUB_ENV
+
+      - name: Update author information
+        run: echo "${GIT_COMMIT_AUTHOR_NAME}" > AUTHOR
+
+      - name: Raise Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          branch: "auto-pr-branch"
+          base: main
+          title: "Demo for auto PR"
+          committer: "${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}"
+          author: "${{ env.GIT_COMMIT_AUTHOR_NAME }} <${{ env.GIT_COMMIT_AUTHOR_EMAIL }}>"
+          body: |
+            This is an example of automatic PR creation.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          delete-branch: true
