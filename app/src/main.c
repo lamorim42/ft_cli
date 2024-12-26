@@ -3,13 +3,18 @@
 
 static void	fallback_msg(void)
 {
-	dprintf(STDERR_FILENO, "Usage: ft [option] [argument] [project_name]\n");
+	dprintf(STDERR_FILENO, FALLBACK);
 }
 
 int	main(int argc, char **argv)
 {
 	t_cli	data;
 
+	if (argc == 2 && !strcmp(argv[1], "--help"))
+	{
+		dprintf(1, HELP);
+		return (0);
+	}
 	if (argc != 4)
 		return (fallback_msg() , 1);
 	init_cli(&data, argc, argv);
