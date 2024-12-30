@@ -1,7 +1,7 @@
 name: Open PR / test
 
 on:
-  pull_request:
+  push:
     branches:
       - feature/**
   workflow_dispatch:
