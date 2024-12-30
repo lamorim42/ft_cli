@@ -22,7 +22,4 @@ jobs:
 
       - name: Test
         shell: bash
-        run: |
-          pwd
-          ls -la
-          echo "${{ github.workspace }}"
+        run: make all
