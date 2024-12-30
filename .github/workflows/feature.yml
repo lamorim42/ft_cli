@@ -11,22 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup C compiler
-        id: install_cc
-        uses: rlalik/setup-cpp-compiler@master
+      - name: PR to Develop
+        uses: desbravacloud/action-create-pull-requests@v1
         with:
-          compiler: latest
-
-      - name: Make
-        shell: bash
-        run: make all
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ft_cli
-          path: ${{ github.workspace }}/ft
-          if-no-files-found: error
+          origin-branch: '${{ github.head_ref}}'
+          target-branch: 'develop'
+          custom-title: 'PR created'
+          custom-body: 'Please, check thease changes'
