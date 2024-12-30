@@ -22,4 +22,4 @@ jobs:
           commit-message: "Create PR"
           title: "Create PR to Develop"
           body: "Create PR"
-          base: develop
+          base: fature/**
