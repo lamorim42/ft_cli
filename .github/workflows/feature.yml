@@ -28,5 +28,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ft_cli
-          path: ft_cli/ft
+          path: ${{ github.workspace }}/ft
           if-no-files-found: error
