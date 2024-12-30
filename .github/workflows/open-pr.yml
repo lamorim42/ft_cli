@@ -1,0 +1,15 @@
+name: Open PR / test
+
+on:
+  pull_request:
+    branches:
+      - feature/**
+  workflow_dispatch:
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
