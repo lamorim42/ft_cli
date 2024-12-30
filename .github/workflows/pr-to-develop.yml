@@ -1,4 +1,4 @@
-name: PR Feature / test
+name: PR Develop / test
 
 on:
   push:
