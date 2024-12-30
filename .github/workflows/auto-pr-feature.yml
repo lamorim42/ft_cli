@@ -1,0 +1,25 @@
+name: PR Feature / test
+
+on:
+  push:
+    branches:
+      - feature/**
+  workflow_dispatch:
+ 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        #uses: actions/check-opened-pr-action@v0.1
+
+      - name: Create PR to Develop
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Create PR"
+          title: "Create PR to Develop"
+          body: "Create PR"
+          base: develop

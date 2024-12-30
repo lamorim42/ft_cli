@@ -23,4 +23,3 @@ ft new project minishell
 ```
 
 ![giff exemplo do ft cli](./assets/ft_cli_ex.gif)
-
