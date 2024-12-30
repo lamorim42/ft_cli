@@ -13,13 +13,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        #uses: actions/check-opened-pr-action@v0.1
 
-      - name: Create PR to Develop
-        uses: peter-evans/create-pull-request@v7
+      - name: Setup C compiler
+        id: install_cc
+        uses: rlalik/setup-cpp-compiler@master
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Create PR"
-          title: "Create PR to Develop"
-          body: "Create PR"
-          base: ${{ github.head_ref }}
+          compiler: latest
+
+      - name: Test
+        shell: bash
+        run: |
+          pwd
+          ls -la
+          echo "${{ github.workspace }}"
