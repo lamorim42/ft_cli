@@ -2,21 +2,27 @@
 NAME	= ft
 CC		= clang
 CFLAGS	= -Wall -Werror -Wextra -g
-INCLUDE	= -I ./app/include
+INCLUDE	= -I app/include
 
-SRC = main.c
-SRC += init_and_free_cli.c
-SRC += is_valid_option.c
-SRC += is_valid_arg.c
-SRC += is_valid_name.c
-SRC += input_validation.c
-SRC += building_project.c
-SRC += cli_utils.c
-SRC += write_in_files.c
+# Fontes organizados por subdiretórios
+SRC = \
+	app/src/main.c \
+	app/src/cli/init_and_free_cli.c \
+	app/src/cli/is_valid_option.c \
+	app/src/cli/is_valid_arg.c \
+	app/src/cli/is_valid_name.c \
+	app/src/cli/input_validation.c \
+	app/src/core/building_project.c \
+	app/src/core/write_in_files.c \
+	app/src/utils/cli_utils.c \
+	app/src/commands/cmd_new.c \
+	app/src/dispatcher/dispatcher.c \
+	app/src/parser/parser.c \
+# 	app/src/fs/fs_create_dir.c \
+# 	app/src/fs/fs_create_file.c
 
-OBJS = $(SRC:.c=.o)
-OBJ = $(addprefix ./app/obj/, $(OBJS))
-OBJ_DIR = ./app/obj
+OBJ_DIR = app/obj
+OBJS = $(SRC:app/src/%.c=$(OBJ_DIR)/%.o)
 
 RM = rm -rf
 
@@ -24,16 +30,19 @@ VPATH = ./app/src
 
 LOCAL_INSTALL = /usr/local/bin
 
+
+# Garante que o subdiretório de destino existe antes de compilar
 $(OBJ_DIR)/%.o: %.c
-			$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(INCLUDE) -c $< -o $@
 
 all: obj_dir $(NAME)
 
-$(NAME): $(OBJ)
-		$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $(NAME)
+$(NAME): $(OBJS)
+		$(CC) $(CFLAGS) $(OBJS) -o $(NAME)
 
 clean:
-	$(RM) $(OBJ)
+	$(RM) $(OBJS)
 	$(RM) $(OBJ_DIR)
 
 fclean: clean
@@ -45,10 +54,6 @@ install: $(NAME)
 re: fclean all
 
 obj_dir:
-	@if [ ! -d "$(OBJ_DIR)" ]; then\
-		mkdir $(OBJ_DIR);\
-	else\
-		echo "make: Nothing to be done for 'all'.";\
-	fi
+	@mkdir -p $(OBJ_DIR)
 
 .PHONY= all clean fclean re install $(NAME)

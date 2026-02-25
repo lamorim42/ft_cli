@@ -1,10 +1,10 @@
 
 #include "ft_cli.h"
 
-static void	fallback_msg(void)
-{
-	dprintf(STDERR_FILENO, FALLBACK);
-}
+// static void	fallback_msg(void)
+// {
+// 	dprintf(STDERR_FILENO, FALLBACK);
+// }
 
 // int	main(int argc, char **argv)
 // {
@@ -27,19 +27,13 @@ static void	fallback_msg(void)
 // 	return (0);
 // }
 
-typedef struct s_command
+
+int main(int argc, char **argv)
 {
-    const char *name;
-    int (*execute)(int argc, char **argv);
-} t_command;
+    t_cli_context ctx;
 
-t_command commands[] = {
-    {"new", cmd_new},
-    {"init", cmd_init},
-    {NULL, NULL}
-};
+    if (parse_args(argc, argv, &ctx))
+        return 1;
 
- int	main(int argc, char **argv)
- {
-
- }
+    return dispatch_command(&ctx);
+}
