@@ -20,6 +20,7 @@ all: obj_dir $(NAME)
 
 $(NAME): $(OBJ)
 		$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o app/bin/$(NAME)
+		cp app/bin/$(NAME) ./$(NAME)
 
 clean:
 	$(RM) $(OBJ)
@@ -27,6 +28,7 @@ clean:
 fclean:
 	$(RM) $(OBJ)
 	$(RM) $(OBJ_DIR)
+	$(RM) app/bin/$(NAME)
 	$(RM) $(NAME)
 
 re: fclean all

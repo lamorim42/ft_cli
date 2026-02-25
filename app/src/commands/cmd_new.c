@@ -1,4 +1,5 @@
 #include "../../include/ft_cli.h"
+#include "../../include/fs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,38 +19,6 @@ static char *str_to_upper(const char *str)
 		result[i] = toupper((unsigned char)str[i]);
 	result[strlen(str)] = '\0';
 	return result;
-}
-
-// Função para criar um diretório
-static int create_directory(const char *path)
-{
-	struct stat st;
-	if (stat(path, &st) == 0 && S_ISDIR(st.st_mode))
-		return 0;
-	return mkdir(path, 0775);
-}
-
-// Função para ler um arquivo inteiro
-static char *read_file(const char *path)
-{
-	FILE *file = fopen(path, "r");
-	if (!file)
-		return NULL;
-	
-	fseek(file, 0, SEEK_END);
-	long size = ftell(file);
-	fseek(file, 0, SEEK_SET);
-	
-	char *content = malloc(size + 1);
-	if (!content) {
-		fclose(file);
-		return NULL;
-	}
-	
-	fread(content, 1, size, file);
-	content[size] = '\0';
-	fclose(file);
-	return content;
 }
 
 // Função para substituir placeholders em um string
@@ -100,11 +69,19 @@ static char *replace_placeholder(const char *content, const char *placeholder, c
 	return result;
 }
 
+// Função para criar um diretório dentro do projeto
+static void create_project_dir(const char *project_name, const char *subdir)
+{
+	char path[512];
+	snprintf(path, sizeof(path), "%s/%s", project_name, subdir);
+	fs_create_dir(path);
+}
+
 // Função para processar e escrever um template
 static int process_template(const char *template_path, const char *output_path, 
 							const char *project_name, const char *include_guard)
 {
-	char *content = read_file(template_path);
+	char *content = fs_read_file(template_path);
 	if (!content) {
 		fprintf(stderr, "Erro ao ler template: %s\n", template_path);
 		return 1;
@@ -133,6 +110,44 @@ static int process_template(const char *template_path, const char *output_path,
 	return 0;
 }
 
+// Função para processar múltiplos templates
+static int process_templates(const char *exe_dir, const char *project_name, 
+							 const char *include_guard)
+{
+	struct {
+		const char *tpl_file;
+		const char *output_format;
+	} templates[] = {
+		{"include.tpl", "%s/app/includes/%s.h"},
+		{"main.tpl", "%s/app/src/main.c"},
+		{"makefile.tpl", "%s/Makefile"},
+		{"readme.tpl", "%s/README.md"},
+		{NULL, NULL}
+	};
+	
+	for (int i = 0; templates[i].tpl_file; i++) {
+		char tpl_path[512];
+		char output_path[512];
+		
+		snprintf(tpl_path, sizeof(tpl_path), "%s/ft_templates/default/%s", 
+				exe_dir, templates[i].tpl_file);
+		
+		// Tratamento especial para o header
+		if (strstr(templates[i].output_format, ".h")) {
+			snprintf(output_path, sizeof(output_path), templates[i].output_format,
+					project_name, project_name);
+		} else {
+			snprintf(output_path, sizeof(output_path), templates[i].output_format,
+					project_name);
+		}
+		
+		if (process_template(tpl_path, output_path, project_name, include_guard) != 0)
+			return 1;
+	}
+	
+	return 0;
+}
+
 int cmd_new_execute(t_cli_context *ctx)
 {
 	printf("Executando comando NEW para projeto %s\n", ctx->project_name);
@@ -147,13 +162,6 @@ int cmd_new_execute(t_cli_context *ctx)
 	exe_path[len] = '\0';
 	char *exe_dir = dirname(exe_path);
 	
-	// Construir caminhos dos templates
-	char include_tpl[512], main_tpl[512], makefile_tpl[512], readme_tpl[512];
-	snprintf(include_tpl, sizeof(include_tpl), "%s/templates/default/include.tpl", exe_dir);
-	snprintf(main_tpl, sizeof(main_tpl), "%s/templates/default/main.tpl", exe_dir);
-	snprintf(makefile_tpl, sizeof(makefile_tpl), "%s/templates/default/makefile.tpl", exe_dir);
-	snprintf(readme_tpl, sizeof(readme_tpl), "%s/templates/default/readme.tpl", exe_dir);
-	
 	// Preparar nomes
 	char *project_upper = str_to_upper(ctx->project_name);
 	if (!project_upper)
@@ -163,50 +171,26 @@ int cmd_new_execute(t_cli_context *ctx)
 	snprintf(include_guard, sizeof(include_guard), "%s_H", project_upper);
 	free(project_upper);
 	
-	// Criar diretórios
-	create_directory(ctx->project_name);
-	create_directory("app");
+	// Criar diretórios principais
+	const char *dirs[] = {
+		"app",
+		"app/includes",
+		"app/src",
+		"app/obj",
+		"app/tests",
+		"app/bin",
+		"doc",
+		"doc/assets",
+		NULL
+	};
 	
-	char buf[512];
-	snprintf(buf, sizeof(buf), "%s/app", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/app/includes", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/app/src", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/app/obj", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/app/tests", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/app/bin", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/doc", ctx->project_name);
-	create_directory(buf);
-	
-	snprintf(buf, sizeof(buf), "%s/doc/assets", ctx->project_name);
-	create_directory(buf);
+	fs_create_dir(ctx->project_name);
+	for (int i = 0; dirs[i]; i++) {
+		create_project_dir(ctx->project_name, dirs[i]);
+	}
 	
 	// Processar templates
-	snprintf(buf, sizeof(buf), "%s/app/includes/%s.h", ctx->project_name, ctx->project_name);
-	if (process_template(include_tpl, buf, ctx->project_name, include_guard) != 0)
-		return 1;
-	
-	snprintf(buf, sizeof(buf), "%s/app/src/main.c", ctx->project_name);
-	if (process_template(main_tpl, buf, ctx->project_name, include_guard) != 0)
-		return 1;
-	
-	snprintf(buf, sizeof(buf), "%s/Makefile", ctx->project_name);
-	if (process_template(makefile_tpl, buf, ctx->project_name, include_guard) != 0)
-		return 1;
-	
-	snprintf(buf, sizeof(buf), "%s/README.md", ctx->project_name);
-	if (process_template(readme_tpl, buf, ctx->project_name, include_guard) != 0)
+	if (process_templates(exe_dir, ctx->project_name, include_guard) != 0)
 		return 1;
 	
 	printf("Estrutura criada com sucesso em %s!\n", ctx->project_name);

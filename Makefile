@@ -18,8 +18,9 @@ SRC = \
 	app/src/commands/cmd_new.c \
 	app/src/dispatcher/dispatcher.c \
 	app/src/parser/parser.c \
-# 	app/src/fs/fs_create_dir.c \
-# 	app/src/fs/fs_create_file.c
+	app/src/fs/fs_create_dir.c \
+	app/src/fs/fs_create_file.c \
+	app/src/fs/fs_read_file.c
 
 OBJ_DIR = app/obj
 OBJS = $(SRC:app/src/%.c=$(OBJ_DIR)/%.o)
@@ -50,6 +51,7 @@ fclean: clean
 
 install: $(NAME)
 	cp $(NAME) $(LOCAL_INSTALL)
+	cp ./ft_templates/ $(LOCAL_INSTALL) -r
 
 re: fclean all
 

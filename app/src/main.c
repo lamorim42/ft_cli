@@ -1,10 +1,10 @@
 
 #include "ft_cli.h"
 
-// static void	fallback_msg(void)
-// {
-// 	dprintf(STDERR_FILENO, FALLBACK);
-// }
+static void	fallback_msg(void)
+{
+	dprintf(STDERR_FILENO, FALLBACK);
+}
 
 // int	main(int argc, char **argv)
 // {
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     t_cli_context ctx;
 
     if (parse_args(argc, argv, &ctx))
-        return 1;
+		return (fallback_msg() , 1);
 
     return dispatch_command(&ctx);
 }
