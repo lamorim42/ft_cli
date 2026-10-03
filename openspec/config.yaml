@@ -1,0 +1,40 @@
+schema: spec-driven
+
+context: |
+  Idioma: todos os artefatos (proposal, specs, design, tasks) em português.
+  Headings estruturais do OpenSpec (## Purpose, ## Requirements, ### Requirement:,
+  #### Scenario:, WHEN/THEN) e as palavras SHALL/MUST ficam em inglês.
+  Mensagens da CLI para o usuário são em português; identificadores no código em inglês.
+
+  Fonte de verdade: openspec/specs/ descreve só o que o código já faz.
+  docs/SPEC.md e docs/TDD.md estão congelados e servem de backlog:
+  - SPEC.md é a fonte dos requisitos que cada change puxa (seções 2 a 8)
+    e dos cenários (critérios de aceite A1-A21 da seção 9).
+  - TDD.md fornece o design de cada change; a seção 7 é o roteiro da ordem dos changes.
+  - Não edite SPEC.md nem TDD.md; mudanças de rumo vão para o change ou para um ADR.
+  docs/adr/ continua vivo e registra decisões transversais.
+
+  Capabilities: cli, project-generation, templates, installation.
+
+  Plataformas: Linux e macOS, só libc + POSIX.1-2008. Sem Norminette;
+  o estilo é definido por .clang-format.
+
+rules:
+  specs:
+    - Use apenas as capabilities cli, project-generation, templates e installation.
+    - Escreva os requisitos em português, com SHALL ou MUST em inglês no corpo.
+    - Derive os cenários dos critérios de aceite do docs/SPEC.md (seção 9) e cite o ID (ex.: A8).
+    - Mensagens citadas nos cenários são exatas e em português, com erros no formato `ft: <mensagem>`.
+    - Só descreva comportamento que o change de fato implementa.
+  design:
+    - Copie a seção relevante do docs/TDD.md em vez de apenas linkar, ajustando ao estado real do código.
+    - Cite os ADRs relacionados (docs/adr/NNNN-*.md).
+    - Diga qual passo do docs/TDD.md seção 7 o change implementa.
+  tasks:
+    - Inclua uma tarefa de teste para cada critério de aceite coberto.
+    - Código novo ou alterado segue o .clang-format do repositório.
+
+operations:
+  archive:
+    guidance:
+      - Ao arquivar, mude para Aceito o status dos ADRs citados no design.md que foram totalmente implementados, e atualize a tabela em docs/adr/README.md.
