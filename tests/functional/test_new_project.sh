@@ -1,5 +1,5 @@
-# A6 e A7 (snapshot do comportamento atual).
-# Muda nos passos 2 (mensagens), 6 (render) e 7 (.gitignore) do docs/TDD.md.
+# A6 e A7. A saída segue o SPEC §5.3; a árvore ainda não tem o .gitignore.
+# Muda nos passos 6 (render) e 7 (.gitignore) do docs/TDD.md.
 
 require_linux
 
@@ -8,12 +8,11 @@ ft_run new project minishell
 assert_status 0
 assert_stderr_empty
 assert_stdout <<'EOF'
-Executando comando NEW para projeto minishell
-Criado arquivo: minishell/app/includes/minishell.h
-Criado arquivo: minishell/app/src/main.c
-Criado arquivo: minishell/Makefile
-Criado arquivo: minishell/README.md
-Estrutura criada com sucesso em minishell!
+criado  minishell/app/includes/minishell.h
+criado  minishell/app/src/main.c
+criado  minishell/Makefile
+criado  minishell/README.md
+Projeto 'minishell' criado com o template 'default'.
 EOF
 
 # Comportamento atual: sem .gitignore (D4, passo 7).

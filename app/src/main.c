@@ -1,9 +1,10 @@
 
+#include "ft.h"
 #include "ft_cli.h"
 
-static void	fallback_msg(void)
+static void fallback_msg(void)
 {
-	dprintf(STDERR_FILENO, FALLBACK);
+    dprintf(STDERR_FILENO, FALLBACK);
 }
 
 // int	main(int argc, char **argv)
@@ -27,13 +28,12 @@ static void	fallback_msg(void)
 // 	return (0);
 // }
 
-
 int main(int argc, char **argv)
 {
     t_cli_context ctx;
 
     if (parse_args(argc, argv, &ctx))
-		return (fallback_msg() , 1);
+        return (fallback_msg(), FT_EUSAGE);
 
     return dispatch_command(&ctx);
 }

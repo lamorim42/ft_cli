@@ -1,6 +1,9 @@
+#include "capture.h"
 #include "fs.h"
 #include "tmpdir.h"
 #include "unity.h"
+
+#include <errno.h>
 
 static char *dir;
 
@@ -179,6 +182,43 @@ static void test_read_file_without_trailing_newline(void)
     free(path);
 }
 
+static void test_create_dir_failure_is_silent(void)
+{
+    char *path = tmpdir_path(dir, "pai/filho");
+
+    TEST_ASSERT_EQUAL_INT(0, capture_start(STDERR_FILENO));
+    int ret = fs_create_dir(path);
+    char *err = capture_end();
+    TEST_ASSERT_EQUAL_INT(-1, ret);
+    TEST_ASSERT_EQUAL_STRING("", err);
+    free(err);
+    free(path);
+}
+
+static void test_create_dir_existing_sets_eexist(void)
+{
+    char *path = tmpdir_path(dir, "novo");
+
+    TEST_ASSERT_EQUAL_INT(0, fs_create_dir(path));
+    errno = 0;
+    TEST_ASSERT_EQUAL_INT(-1, fs_create_dir(path));
+    TEST_ASSERT_EQUAL_INT(EEXIST, errno);
+    free(path);
+}
+
+static void test_create_file_failure_is_silent(void)
+{
+    char *path = tmpdir_path(dir, "pai/arquivo.txt");
+
+    TEST_ASSERT_EQUAL_INT(0, capture_start(STDERR_FILENO));
+    int ret = fs_create_file(path);
+    char *err = capture_end();
+    TEST_ASSERT_EQUAL_INT(-1, ret);
+    TEST_ASSERT_EQUAL_STRING("", err);
+    free(err);
+    free(path);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -195,5 +235,8 @@ int main(void)
     RUN_TEST(test_create_file_fails_without_parent);
     RUN_TEST(test_read_file_large_content);
     RUN_TEST(test_read_file_without_trailing_newline);
+    RUN_TEST(test_create_dir_failure_is_silent);
+    RUN_TEST(test_create_dir_existing_sets_eexist);
+    RUN_TEST(test_create_file_failure_is_silent);
     return UNITY_END();
 }

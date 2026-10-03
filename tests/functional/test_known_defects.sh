@@ -3,12 +3,14 @@
 
 require_linux
 
-# D3: repetir A6 sobrescreve o projeto sem aviso (passo 8, A8: código 2, nada alterado).
+# D3: repetir A6 sobrescreve o projeto sem aviso, e o diretório existente não gera
+# mensagem (passo 8, A8: código 2, nada alterado).
 ft_run new project minishell
 assert_status 0
 printf 'trabalho do usuario\n' >minishell/README.md
 ft_run new project minishell
 assert_status 0
+assert_stderr_empty
 printf '# Hello minishell' | assert_file_eq minishell/README.md
 
 # D2: nome inválido é aceito (passo 4, A10: código 1, nada criado).

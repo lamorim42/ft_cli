@@ -20,7 +20,8 @@ SRC = \
 	app/src/parser/parser.c \
 	app/src/fs/fs_create_dir.c \
 	app/src/fs/fs_create_file.c \
-	app/src/fs/fs_read_file.c
+	app/src/fs/fs_read_file.c \
+	app/src/output/output.c
 
 OBJ_DIR = app/obj
 OBJS = $(SRC:app/src/%.c=$(OBJ_DIR)/%.o)

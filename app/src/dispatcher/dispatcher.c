@@ -1,7 +1,8 @@
 #include "ft_cli.h"
 #include "command.h"
+#include "ft.h"
+#include "output.h"
 #include <string.h>
-#include <stdio.h>
 
 int dispatch_command(t_cli_context *ctx)
 {
@@ -11,6 +12,6 @@ int dispatch_command(t_cli_context *ctx)
             return g_commands[i].execute(ctx);
     }
 
-    printf("Comando desconhecido: %s\n", ctx->command);
-    return 1;
+    ft_err("comando desconhecido: %s", ctx->command);
+    return FT_EUSAGE;
 }
