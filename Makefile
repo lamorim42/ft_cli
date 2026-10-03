@@ -34,6 +34,9 @@ TEST_SUP	= $(wildcard $(TEST_DIR)/unit/support/*.c)
 TEST_BINS	= $(TEST_SRC:$(TEST_DIR)/unit/%.c=$(TEST_DIR)/bin/%)
 TEST_FLAGS	= $(INCLUDE) -I $(UNITY_DIR) -I $(TEST_DIR)/unit/support
 
+# Testes funcionais (shell POSIX em tests/functional)
+FUNC_RUNNER	= $(TEST_DIR)/run.sh
+
 RM = rm -rf
 
 VPATH = ./app/src
@@ -72,9 +75,17 @@ $(TEST_DIR)/bin/%: $(TEST_DIR)/unit/%.c $(TEST_SUP) $(UNITY_DIR)/unity.c $(APP_O
 test-unit: $(TEST_BINS)
 	@fail=0; for t in $(TEST_BINS); do ./$$t || fail=1; done; exit $$fail
 
-test: test-unit
+test-functional: $(NAME)
+	@sh $(FUNC_RUNNER) ./$(NAME)
 
-.PHONY: test test-unit
+# Roda as duas suítes e só falha no fim, para uma não esconder a outra.
+test:
+	@fail=0; \
+	$(MAKE) --no-print-directory test-unit || fail=1; \
+	$(MAKE) --no-print-directory test-functional || fail=1; \
+	exit $$fail
+
+.PHONY: test test-unit test-functional
 
 obj_dir:
 	@mkdir -p $(OBJ_DIR)

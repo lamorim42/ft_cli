@@ -27,11 +27,12 @@ ft new project minishell
 ## Testes
 
 ```sh
-make test         # compila e roda todos os testes
-make test-unit    # só os testes unitários
+make test              # compila e roda todos os testes (unitários e funcionais)
+make test-unit         # só os testes unitários
+make test-functional   # só os testes funcionais
 ```
 
-O `make test` sai com código diferente de zero se algum teste falhar. Não é preciso instalar nada: a biblioteca de testes, [Unity](https://github.com/ThrowTheSwitch/Unity), está em `tests/vendor/unity/` (versão em `tests/vendor/unity/VERSION`).
+O `make test` roda as duas suítes mesmo que a primeira falhe, e sai com código diferente de zero se algum teste falhar. Não é preciso instalar nada: a biblioteca dos testes unitários, [Unity](https://github.com/ThrowTheSwitch/Unity), está em `tests/vendor/unity/` (versão em `tests/vendor/unity/VERSION`).
 
 Os testes unitários ficam em `tests/unit/`, um arquivo por módulo (`test_<módulo>.c`). Cada arquivo vira um executável próprio em `tests/bin/`, então um teste que trava não impede os outros de rodar. Código de apoio compartilhado, como o diretório temporário usado nos testes de `fs`, fica em `tests/unit/support/`.
 
@@ -58,6 +59,34 @@ int main(void)
 ```
 
 Declare as funções de teste como `static`: se faltar o `RUN_TEST` de alguma, o compilador avisa que ela não é usada e o build falha, em vez de o teste nunca rodar.
+
+### Testes funcionais
+
+Os testes funcionais rodam o binário `./ft` de ponta a ponta: conferem o código de saída, o `stdout`, o `stderr` e a árvore gerada, e compilam o projeto criado. São scripts em shell POSIX em `tests/functional/test_<cenário>.sh`, executados por `tests/run.sh`:
+
+```sh
+sh tests/run.sh ./ft                  # o que o make test-functional faz
+FT_TEST_KEEP=1 sh tests/run.sh ./ft   # mantém os diretórios temporários para depurar
+```
+
+Cada arquivo roda num diretório temporário próprio, nunca no repositório. O arquivo sai com `0` se passou, `77` se foi pulado (por exemplo, a geração de projeto só funciona no Linux por enquanto) e qualquer outro código se falhou. A primeira asserção que falha encerra o arquivo e mostra o diff entre o esperado e o obtido.
+
+Para criar um teste novo, crie `tests/functional/test_<cenário>.sh`. O runner o encontra sozinho e carrega antes os helpers de `tests/functional/lib.sh`:
+
+```sh
+require_linux                  # pula fora do Linux
+
+ft_run new project minishell   # roda o ft e guarda stdout, stderr e o código de saída
+assert_status 0
+assert_stderr_empty
+assert_stdout <<'EOF'
+Executando comando NEW para projeto minishell
+...
+EOF
+assert_exists minishell/Makefile
+```
+
+Os testes funcionais registram o comportamento **atual** da `ft`, inclusive defeitos conhecidos (como `ft --help` sair com `1`). Cada passo da migração descrita em `docs/TDD.md` atualiza a expectativa dos testes que muda, e o diff do teste deixa a mudança explícita na revisão.
 
 
 # Prompts

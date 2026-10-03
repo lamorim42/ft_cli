@@ -106,6 +106,79 @@ static void test_read_file_missing_returns_null(void)
     free(path);
 }
 
+// Comportamento atual: sem mkdir -p (o passo 5 traz o fs_mkdir_p).
+static void test_create_dir_fails_without_parent(void)
+{
+    char *path = tmpdir_path(dir, "pai/filho");
+
+    TEST_ASSERT_EQUAL_INT(-1, fs_create_dir(path));
+    TEST_ASSERT_EQUAL_INT(-1, access(path, F_OK));
+    free(path);
+}
+
+static void test_create_dir_fails_over_regular_file(void)
+{
+    char *path = tmpdir_path(dir, "arquivo");
+    write_file(path, "x");
+
+    TEST_ASSERT_EQUAL_INT(-1, fs_create_dir(path));
+    TEST_ASSERT_FALSE(is_dir(path));
+    free(path);
+}
+
+static void test_create_dir_uses_mode_0755(void)
+{
+    char *path = tmpdir_path(dir, "modo");
+    mode_t old = umask(022);
+    struct stat sb;
+
+    TEST_ASSERT_EQUAL_INT(0, fs_create_dir(path));
+    umask(old);
+    TEST_ASSERT_EQUAL_INT(0, stat(path, &sb));
+    TEST_ASSERT_EQUAL_UINT(0755, sb.st_mode & 0777);
+    free(path);
+}
+
+static void test_create_file_fails_without_parent(void)
+{
+    char *path = tmpdir_path(dir, "pai/arquivo.txt");
+
+    TEST_ASSERT_EQUAL_INT(-1, fs_create_file(path));
+    TEST_ASSERT_EQUAL_INT(-1, access(path, F_OK));
+    free(path);
+}
+
+static void test_read_file_large_content(void)
+{
+    char *path = tmpdir_path(dir, "grande.txt");
+    size_t size = 64 * 1024;
+    char *expected = malloc(size + 1);
+    TEST_ASSERT_NOT_NULL(expected);
+    for (size_t i = 0; i < size; i++)
+        expected[i] = (char)('a' + i % 26);
+    expected[size] = '\0';
+    write_file(path, expected);
+
+    char *content = fs_read_file(path);
+    TEST_ASSERT_NOT_NULL(content);
+    TEST_ASSERT_EQUAL_size_t(size, strlen(content));
+    TEST_ASSERT_EQUAL_MEMORY(expected, content, size + 1);
+    free(content);
+    free(expected);
+    free(path);
+}
+
+static void test_read_file_without_trailing_newline(void)
+{
+    char *path = tmpdir_path(dir, "sem_newline.txt");
+    write_file(path, "# Hello {{PROJECT_NAME}}");
+
+    char *content = fs_read_file(path);
+    TEST_ASSERT_EQUAL_STRING("# Hello {{PROJECT_NAME}}", content);
+    free(content);
+    free(path);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
@@ -116,5 +189,11 @@ int main(void)
     RUN_TEST(test_read_file_returns_exact_content);
     RUN_TEST(test_read_file_empty_returns_empty_string);
     RUN_TEST(test_read_file_missing_returns_null);
+    RUN_TEST(test_create_dir_fails_without_parent);
+    RUN_TEST(test_create_dir_fails_over_regular_file);
+    RUN_TEST(test_create_dir_uses_mode_0755);
+    RUN_TEST(test_create_file_fails_without_parent);
+    RUN_TEST(test_read_file_large_content);
+    RUN_TEST(test_read_file_without_trailing_newline);
     return UNITY_END();
 }

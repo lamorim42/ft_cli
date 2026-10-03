@@ -1,7 +1,7 @@
 # ADR-0008: Estratégia de testes e integração contínua
 
 - **Status:** Proposto
-- **Data:** 2026-10-01 (biblioteca de testes unitários definida em 2026-10-02)
+- **Data:** 2026-10-01 (biblioteca de testes unitários e testes funcionais definidos em 2026-10-02)
 - **Relacionados:** ADR-0004, ADR-0006, ADR-0007
 
 ## Contexto
@@ -14,7 +14,7 @@ Os workflows em `.github/workflows/` só abrem PRs automaticamente e usam `githu
 
 ### Testes
 
-1. **Integração, em shell** (`tests/run.sh`), chamado por `make test`:
+1. **Integração, em shell** (`tests/run.sh`), chamado por `make test`. No repositório esta camada se chama **funcional**: `tests/functional/test_<cenário>.sh`, com helpers em `tests/functional/lib.sh`, rodados por `make test-functional`. Cada arquivo roda num `mktemp -d` próprio e sai com `0` (passou), `77` (pulado, com o motivo) ou outro código (falhou). Os primeiros testes são snapshots do comportamento atual (A6 ainda sem `.gitignore`, A7 e os defeitos D1–D3), que cada passo da migração atualiza até chegar ao alvo:
    - roda `ft new project foo` num diretório temporário;
    - confere a árvore gerada, incluindo o `.gitignore`;
    - roda `make` dentro de `foo/` e executa o binário gerado.

@@ -17,9 +17,25 @@ static void test_unknown_command_returns_error(void)
     TEST_ASSERT_EQUAL_INT(1, dispatch_command(&ctx));
 }
 
+static void test_command_name_is_case_sensitive(void)
+{
+    t_cli_context ctx = {.command = "NEW", .type = "project", .project_name = "x", .verbose = 0};
+
+    TEST_ASSERT_EQUAL_INT(1, dispatch_command(&ctx));
+}
+
+static void test_empty_command_returns_error(void)
+{
+    t_cli_context ctx = {.command = "", .type = "project", .project_name = "x", .verbose = 0};
+
+    TEST_ASSERT_EQUAL_INT(1, dispatch_command(&ctx));
+}
+
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_unknown_command_returns_error);
+    RUN_TEST(test_command_name_is_case_sensitive);
+    RUN_TEST(test_empty_command_returns_error);
     return UNITY_END();
 }

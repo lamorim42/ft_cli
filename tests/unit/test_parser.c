@@ -41,11 +41,40 @@ static void test_help_flag_is_rejected(void)
     TEST_ASSERT_EQUAL_INT(1, parse_args(2, argv, &ctx));
 }
 
+static void test_short_help_flag_is_rejected(void)
+{
+    char *argv[] = {"ft", "-h", NULL};
+
+    TEST_ASSERT_EQUAL_INT(1, parse_args(2, argv, &ctx));
+}
+
+static void test_fields_point_into_argv(void)
+{
+    char *argv[] = {"ft", "new", "project", "minishell", NULL};
+
+    TEST_ASSERT_EQUAL_INT(0, parse_args(4, argv, &ctx));
+    TEST_ASSERT_EQUAL_PTR(argv[1], ctx.command);
+    TEST_ASSERT_EQUAL_PTR(argv[2], ctx.type);
+    TEST_ASSERT_EQUAL_PTR(argv[3], ctx.project_name);
+}
+
+// Comportamento atual: flags não são reconhecidas (o passo 3 traz o parser novo).
+static void test_flag_in_name_position_becomes_name(void)
+{
+    char *argv[] = {"ft", "new", "project", "--force", NULL};
+
+    TEST_ASSERT_EQUAL_INT(0, parse_args(4, argv, &ctx));
+    TEST_ASSERT_EQUAL_STRING("--force", ctx.project_name);
+}
+
 int main(void)
 {
     UNITY_BEGIN();
     RUN_TEST(test_four_args_fill_context);
     RUN_TEST(test_other_argc_returns_error);
     RUN_TEST(test_help_flag_is_rejected);
+    RUN_TEST(test_short_help_flag_is_rejected);
+    RUN_TEST(test_fields_point_into_argv);
+    RUN_TEST(test_flag_in_name_position_becomes_name);
     return UNITY_END();
 }
