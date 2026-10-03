@@ -23,8 +23,8 @@ rules:
   specs:
     - Use apenas as capabilities cli, project-generation, templates e installation.
     - Escreva os requisitos em português, com SHALL ou MUST em inglês no corpo.
-    - Derive os cenários dos critérios de aceite do docs/SPEC.md (seção 9) e cite o ID (ex.: A8).
-    - Mensagens citadas nos cenários são exatas e em português, com erros no formato `ft: <mensagem>`.
+    - "Derive os cenários dos critérios de aceite do docs/SPEC.md (seção 9) e cite o ID (ex.: A8)."
+    - "Mensagens citadas nos cenários são exatas e em português, com erros no formato `ft: <mensagem>`."
     - Só descreva comportamento que o change de fato implementa.
   design:
     - Copie a seção relevante do docs/TDD.md em vez de apenas linkar, ajustando ao estado real do código.
