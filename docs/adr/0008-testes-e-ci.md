@@ -1,7 +1,7 @@
 # ADR-0008: Estratégia de testes e integração contínua
 
 - **Status:** Proposto
-- **Data:** 2026-10-01
+- **Data:** 2026-10-01 (biblioteca de testes unitários definida em 2026-10-02)
 - **Relacionados:** ADR-0004, ADR-0006, ADR-0007
 
 ## Contexto
@@ -23,7 +23,12 @@ Os workflows em `.github/workflows/` só abrem PRs automaticamente e usam `githu
    - projeto que já existe, com e sem `--force`;
    - argumentos faltando e comando desconhecido;
    - `--help` e `-h`.
-3. **Unitários pequenos** para `tpl_render` (ADR-0004): placeholder repetido, placeholder ausente, string vazia e `vars` vazio.
+3. **Unitários** com a biblioteca [Unity](https://github.com/ThrowTheSwitch/Unity), copiada em `tests/vendor/unity/`:
+   - um arquivo `tests/unit/test_<módulo>.c` por módulo, cada um compilado como executável próprio e rodado por `make test`;
+   - os primeiros cobrem `parse_args`, `dispatch_command` e `fs_*`, registrando o comportamento atual;
+   - cada change da migração acrescenta os seus, como os de `tpl_render` (ADR-0004): placeholder repetido, placeholder ausente, string vazia e `vars` vazio.
+
+   **Por que Unity:** os critérios foram ser acessível (sem instalação nem `sudo`, em Linux e macOS), fácil de usar e flexível para o Makefile do projeto. A Unity são três arquivos em C puro, sem dependências, com asserts que mostram esperado × obtido. O custo é registrar cada teste no `main` com `RUN_TEST`; declarar os testes como `static` faz o `-Werror` acusar um registro esquecido.
 
 ### CI (rodando em cada PR)
 
@@ -39,7 +44,12 @@ Trocar `github.head_ref` por `${{ github.ref_name }}` no `origin-branch`.
 
 ## Alternativas consideradas
 
-- **Usar só testes unitários em C** (com Criterion, Unity etc.): não pegariam os bugs reais encontrados, que estão na interação entre parser, comando e sistema de arquivos. Os testes de integração em shell cobrem isso com pouco esforço.
+- **Usar só testes unitários em C:** não pegariam os bugs reais encontrados, que estão na interação entre parser, comando e sistema de arquivos. Por isso unitários e integração convivem: os unitários isolam a lógica de cada módulo, e os testes em shell cobrem o fluxo completo.
+- **Outras bibliotecas de testes unitários:**
+  - *Criterion:* a mais ergonômica (testes se registram sozinhos, cada um num processo), mas exige a lib instalada em cada máquina e no CI, o que é uma barreira sem `sudo`.
+  - *cmocka:* também exige instalação, e o ponto forte dela, os mocks, não é necessário aqui.
+  - *acutest:* um header só e portátil, mas os asserts são genéricos (`TEST_CHECK(strcmp(...) == 0)`) e as mensagens de falha não mostram os valores.
+  - *`assert` puro* (proposta original do TDD §6): para no primeiro erro, não mostra esperado × obtido e não tem `setUp`/`tearDown`.
 - **Fazer só testes manuais:** foi o que deixou passar as regressões.
 
 ## Consequências

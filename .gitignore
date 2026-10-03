@@ -1,3 +1,5 @@
 obj/
 obj/*
 ft
+tests/bin/
+tests/obj/

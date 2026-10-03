@@ -24,6 +24,41 @@ ft new project minishell
 
 ![giff exemplo do ft cli](./assets/ft_cli_ex.gif)
 
+## Testes
+
+```sh
+make test         # compila e roda todos os testes
+make test-unit    # só os testes unitários
+```
+
+O `make test` sai com código diferente de zero se algum teste falhar. Não é preciso instalar nada: a biblioteca de testes, [Unity](https://github.com/ThrowTheSwitch/Unity), está em `tests/vendor/unity/` (versão em `tests/vendor/unity/VERSION`).
+
+Os testes unitários ficam em `tests/unit/`, um arquivo por módulo (`test_<módulo>.c`). Cada arquivo vira um executável próprio em `tests/bin/`, então um teste que trava não impede os outros de rodar. Código de apoio compartilhado, como o diretório temporário usado nos testes de `fs`, fica em `tests/unit/support/`.
+
+Para criar um teste novo, crie `tests/unit/test_<módulo>.c`. O `Makefile` encontra o arquivo sozinho:
+
+```c
+#include "unity.h"
+#include "ft_cli.h"
+
+void setUp(void) {}    // roda antes de cada teste
+void tearDown(void) {} // roda depois de cada teste
+
+static void test_algo(void)
+{
+    TEST_ASSERT_EQUAL_INT(0, funcao_testada());
+}
+
+int main(void)
+{
+    UNITY_BEGIN();
+    RUN_TEST(test_algo); // um RUN_TEST para cada função de teste
+    return UNITY_END();
+}
+```
+
+Declare as funções de teste como `static`: se faltar o `RUN_TEST` de alguma, o compilador avisa que ela não é usada e o build falha, em vez de o teste nunca rodar.
+
 
 # Prompts
 

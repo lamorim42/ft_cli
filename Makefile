@@ -24,6 +24,15 @@ SRC = \
 
 OBJ_DIR = app/obj
 OBJS = $(SRC:app/src/%.c=$(OBJ_DIR)/%.o)
+APP_OBJS = $(filter-out $(OBJ_DIR)/main.o,$(OBJS))
+
+# Testes unitários (Unity em tests/vendor/unity)
+TEST_DIR	= tests
+UNITY_DIR	= $(TEST_DIR)/vendor/unity
+TEST_SRC	= $(wildcard $(TEST_DIR)/unit/test_*.c)
+TEST_SUP	= $(wildcard $(TEST_DIR)/unit/support/*.c)
+TEST_BINS	= $(TEST_SRC:$(TEST_DIR)/unit/%.c=$(TEST_DIR)/bin/%)
+TEST_FLAGS	= $(INCLUDE) -I $(UNITY_DIR) -I $(TEST_DIR)/unit/support
 
 RM = rm -rf
 
@@ -48,12 +57,24 @@ clean:
 
 fclean: clean
 	$(RM) $(NAME)
+	$(RM) $(TEST_DIR)/bin $(TEST_DIR)/obj
 
 install: $(NAME)
 	cp $(NAME) $(LOCAL_INSTALL)
 	cp ./ft_templates/ $(LOCAL_INSTALL) -r
 
 re: fclean all
+
+$(TEST_DIR)/bin/%: $(TEST_DIR)/unit/%.c $(TEST_SUP) $(UNITY_DIR)/unity.c $(APP_OBJS)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(TEST_FLAGS) $^ -o $@
+
+test-unit: $(TEST_BINS)
+	@fail=0; for t in $(TEST_BINS); do ./$$t || fail=1; done; exit $$fail
+
+test: test-unit
+
+.PHONY: test test-unit
 
 obj_dir:
 	@mkdir -p $(OBJ_DIR)
